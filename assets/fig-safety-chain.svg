@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 430" role="img" aria-label="安全系统工程八步法流程">
+  <defs>
+    <style>
+      .t{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:12.5px;fill:#101a26}
+      .ts{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:11px;fill:#5d6b7a}
+      .tn{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;fill:#fff;font-weight:700}
+      .tn2{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;fill:#0d4f7c;font-weight:700}
+      .bx{fill:#f3f7fa;stroke:#cfdbe6;stroke-width:1.2}
+      .bh{fill:#0d4f7c;stroke:#0d4f7c}
+      .bo{fill:#fdf3ea;stroke:#e2a06a;stroke-width:1.2}
+      .ln{stroke:#93a6b6;stroke-width:1.2;fill:none}
+    </style>
+    <marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#93a6b6"/>
+    </marker>
+  </defs>
+
+  <text class="ts" x="20" y="24">输入：运行概念（ConOps）· 系统边界 · 场景库 · 历史事故与行业事件</text>
+
+  <!-- 八个步骤：两行 -->
+  <g>
+    <!-- 行1 -->
+    <rect class="bh" x="20" y="44" width="216" height="92" rx="10"/>
+    <text class="tn" x="36" y="72">① 场景与任务定义</text>
+    <text x="36" y="96" class="t" fill="#dbe9f3">任务剖面 · 起降场地 · 气象与空域</text>
+    <text x="36" y="116" class="t" fill="#dbe9f3">乘员与地面人员分布</text>
+
+    <rect class="bx" x="252" y="44" width="216" height="92" rx="10"/>
+    <text class="tn2" x="268" y="72">② 危害识别（HAZOP/STPA）</text>
+    <text x="268" y="96" class="t">功能失效 · 交互失控 · 误用</text>
+    <text x="268" y="116" class="t">外部威胁（风、鸟、地面车辆）</text>
+
+    <rect class="bx" x="484" y="44" width="216" height="92" rx="10"/>
+    <text class="tn2" x="500" y="72">③ 风险评估（HARA）</text>
+    <text x="500" y="96" class="t">严重度 S · 暴露率 E · 可控性 C</text>
+    <text x="500" y="116" class="t">ASIL / DAL 分级与接受准则</text>
+
+    <rect class="bx" x="716" y="44" width="244" height="92" rx="10"/>
+    <text class="tn2" x="732" y="72">④ 安全需求与目标</text>
+    <text x="732" y="96" class="t">功能安全 · SOTIF · 信息安全</text>
+    <text x="732" y="116" class="t">被动安全与运行安全需求</text>
+
+    <path class="ln" d="M236 90 L248 90" marker-end="url(#c1)"/>
+    <path class="ln" d="M468 90 L480 90" marker-end="url(#c1)"/>
+    <path class="ln" d="M700 90 L712 90" marker-end="url(#c1)"/>
+
+    <!-- 行2（从右到左） -->
+    <rect class="bx" x="716" y="164" width="244" height="92" rx="10"/>
+    <text class="tn2" x="732" y="192">⑤ 架构与冗余设计</text>
+    <text x="732" y="216" class="t">2oo3 / 双余度电源 / 独立通道</text>
+    <text x="732" y="236" class="t">失效隔离与降级运行</text>
+
+    <rect class="bx" x="484" y="164" width="216" height="92" rx="10"/>
+    <text class="tn2" x="500" y="192">⑥ 验证与确认（V&amp;V）</text>
+    <text x="500" y="216" class="t">HIL 仿真 · 故障注入 · 试飞</text>
+    <text x="500" y="236" class="t">场景覆盖率与置信度</text>
+
+    <rect class="bx" x="252" y="164" width="216" height="92" rx="10"/>
+    <text class="tn2" x="268" y="192">⑦ 运行监控与反馈</text>
+    <text x="268" y="216" class="t">QAR/飞行数据 · 事件报告</text>
+    <text x="268" y="236" class="t">持续适航与 OTA 变更管理</text>
+
+    <rect class="bo" x="20" y="164" width="216" height="92" rx="10"/>
+    <text class="tn2" x="36" y="192" fill="#a15c00">⑧ 安全论证（GSN/SACM）</text>
+    <text x="36" y="216" class="t">目标—策略—证据链</text>
+    <text x="36" y="236" class="t">残余风险与接受声明</text>
+
+    <path class="ln" d="M716 210 L704 210" marker-end="url(#c1)"/>
+    <path class="ln" d="M484 210 L472 210" marker-end="url(#c1)"/>
+    <path class="ln" d="M252 210 L240 210" marker-end="url(#c1)"/>
+    <path class="ln" d="M960 90 L972 90 L972 210 L964 210" marker-end="url(#c1)"/>
+
+    <!-- 反馈回路 -->
+    <path class="ln" d="M128 256 L128 300 L860 300 L860 260" marker-end="url(#c1)" stroke-dasharray="5 4"/>
+    <path class="ln" d="M128 300 L128 268" marker-end="url(#c1)" stroke-dasharray="5 4"/>
+    <text class="ts" x="420" y="292">变更管理：设计/软件/运行程序变更 → 重新评估受影响危害（不是重新做全套）</text>
+  </g>
+
+  <rect class="bx" x="20" y="330" width="940" height="76" rx="10"/>
+  <text class="ts" x="36" y="354">与标准的接口</text>
+  <text class="t" x="36" y="378">ISO 26262（功能安全）· ISO 21448（预期功能安全）· ISO 21434（信息安全）· ISO 34502（场景评价）</text>
+  <text class="t" x="36" y="398">SAE ARP4754A（系统研制）· ARP4761（安全评估）· EASA SC-VTOL / FAA Powered-Lift · CAAC 专用条件</text>
+</svg>

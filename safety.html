@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分体式飞行汽车的全方位安全分析 | 飞行汽车技术基础 · 作业二</title>
+<meta name="description" content="以系统安全工程方法对分体式飞行汽车「陆地航母」做全面安全分析：ConOps、危害识别与风险评估、功能安全与冗余、SOTIF、信息安全、被动安全与运行安全。">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23c2410c'/><path d='M50 22 L78 74 H22 Z' stroke='%23fff' stroke-width='9' fill='none' stroke-linejoin='round'/></svg>">
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html"><span class="dot"></span>飞行汽车技术基础 · 课程作业</a>
+    <nav class="topnav">
+      <a href="index.html">作业一 · 调研与分析</a>
+      <a href="safety.html" class="active">作业二 · 安全分析</a>
+      <a href="#refs">参考文献</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-in">
+    <div class="kicker">Case 02 · System Safety Engineering</div>
+    <h1>从一个“对接接口”说起：<br>分体式飞行汽车的全方位安全分析</h1>
+    <p class="h1-en">A Full-Spectrum Safety Analysis of a Modular Flying Car</p>
+    <p class="lede">
+      整机式飞行汽车的安全分析，本质上是在一台机器上同时处理地面碰撞与空中失效。分体式把这两件事分给了两个产品，却新增了一个<b>两者耦合的接口</b>——
+      而几乎所有最难的问题，都集中在这个接口上：它既是机械连接，也是电气连接，还是<b>一次“身份切换”的确认点</b>。
+      本文沿用作业一的对象，用系统安全工程的方法，把危害、需求、控制措施与证据逐层展开。
+    </p>
+    <div class="meta">
+      <div><b>研究对象</b> 小鹏汇天 陆地航母（同作业一）</div>
+      <div><b>方法</b> ConOps → HAZOP/STPA → HARA → 需求与架构 → V&amp;V → GSN</div>
+      <div><b>证据截止</b> 2026-11-25</div>
+      <div><b>作者</b> 于文淼 · 学号 15230827 · 工业设计（152308 班）</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <aside class="toc">
+    <h6>目录 Contents</h6>
+    <ol>
+      <li><a href="#summary">摘要</a></li>
+      <li><a href="#method">01 分析方法</a></li>
+      <li><a href="#conops">02 运行概念与系统边界</a></li>
+      <li><a href="#hazard">03 危害识别与风险评估</a></li>
+      <li><a href="#fusa">04 功能安全与冗余架构</a></li>
+      <li><a href="#sotif">05 SOTIF 与人为因素</a></li>
+      <li><a href="#sec">06 信息安全</a></li>
+      <li><a href="#passive">07 被动安全与电池安全</a></li>
+      <li><a href="#ops">08 运行安全</a></li>
+      <li><a href="#gsn">09 安全论证</a></li>
+      <li><a href="#map">10 标准映射</a></li>
+      <li><a href="#conclusion">11 结论与建议</a></li>
+      <li><a href="#refs">参考文献</a></li>
+    </ol>
+  </aside>
+
+  <main>
+
+  <section id="summary">
+    <div class="sec-head">
+      <span class="sec-no">EXECUTIVE SUMMARY</span>
+      <h2>摘要<span class="en">What changes when the vehicle splits in two</span></h2>
+    </div>
+
+    <p>分体式并没有减少安全问题的总量，它<strong>重新分配</strong>了这些问题：地面段的碰撞与电气安全被交给成熟的汽车体系处理，空中段的失效概率要求被压缩到一台更小的航空器上，而两者之间新增了一个<strong>高耦合、低频次、高风险</strong>的接口。围绕这个判断，本文给出五条结论。</p>
+
+    <ol>
+      <li><strong>最危险的不是飞行，而是“以为已经锁好”。</strong>对接接口的状态不确定性，会把一个地面操作失误直接转化为空中灾难。因此它的安全目标不是“提高可靠性”，而是<strong>让“未确认锁止”在物理与逻辑上都无法起飞</strong>。</li>
+      <li><strong>分体式天然具备“阶段隔离”的优势。</strong>地面段与空中段的危害不共享暴露时间：车在高速上时飞行体不在飞，飞行体在飞时车在静止。这降低了部分风险，但也意味着<strong>驾驶员的注意力切换</strong>成为新的失效源。</li>
+      <li><strong>功能安全的重点是“失效后可继续可控”。</strong>多旋翼的旋翼冗余使其具备容错能力，但前提是飞控能在毫秒级识别失效并重新分配推力；这要求传感器、计算与配电三条链路都具备独立性。</li>
+      <li><strong>SOTIF 风险被低估。</strong>低空阵风、地面效应、起降场视觉遮挡、电池 SOC 估计误差，都不属于“硬件坏了”，却足以造成事故；这类风险不能靠提高可靠性解决，只能靠场景限制与运行规程。</li>
+      <li><strong>双证运行带来责任边界问题。</strong>“此刻它算车还是算机”，决定了适用哪套法规、由谁负责、保险如何理赔。这个边界必须在运行手册与产品定义中写清楚，而不是留给事故调查去解释。</li>
+    </ol>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">12</div><div class="l">本文识别的安全关键危害</div></div>
+      <div class="kpi"><div class="n">4</div><div class="l">安全关键子系统（飞控/动力/配电/对接）</div></div>
+      <div class="kpi"><div class="n">2</div><div class="l">需同时满足的监管体系（道路/航空）</div></div>
+      <div class="kpi"><div class="n">1</div><div class="l">新增的高耦合接口（分离/结合）</div></div>
+    </div>
+  </section>
+
+  <section id="method">
+    <div class="sec-head">
+      <span class="sec-no">01</span>
+      <h2>分析方法<span class="en">Method: from ConOps to a safety argument</span></h2>
+    </div>
+
+    <p>课程给出的九步法可以压缩成一条可执行的主线：<strong>场景定义 → 危害识别 → 风险评估 → 安全需求 → 架构设计 → 验证 → 运行监控 → 安全论证</strong>。本文按这条主线展开，并在每一步注明引用的标准与方法。</p>
+
+    <figure>
+      <div class="fig-box">
+        <img src="assets/fig-safety-chain.svg" alt="安全系统工程八步法流程图">
+      </div>
+      <figcaption><b>图 1</b> 安全系统工程主线。第 ⑧ 步的安全论证不是“最后写一份文件”，而是把前面每一步的结论组织成可审查的证据链；变更管理则保证设计迭代后不会遗漏受影响的危害。</figcaption>
+    </figure>
+
+    <h3>1.1 方法选择</h3>
+    <div class="tw">
+      <table>
+        <caption><b>表 1</b> 本文使用的方法及其适用理由</caption>
+        <thead>
+          <tr><th style="width:130px">方法</th><th>用途</th><th>为什么选它</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ConOps</td><td>定义任务阶段与运行环境</td><td>分体式的危害高度依赖“处于哪个阶段”，必须先切分阶段</td></tr>
+          <tr><td>HAZOP</td><td>按引导词系统地扫描接口与流程</td><td>对接接口是一个“过程”，适合用偏差引导词（过早/过晚/未完成）扫描</td></tr>
+          <tr><td>STPA</td><td>识别控制行为缺失、错误时序、持续时间过长</td><td>飞控与对接都是“控制器—执行器”结构，STPA 能发现传统 FMEA 漏掉的交互失效</td></tr>
+          <tr><td>HARA</td><td>按 S/E/C 三维定级</td><td>把危害转成可分配的安全目标（ASIL/DAL 类比）</td></tr>
+          <tr><td>FTA / FMEA</td><td>自顶向下与自底向上交叉验证</td><td>验证“单点失效不致命”这一关键假设</td></tr>
+          <tr><td>GSN</td><td>组织论证结构</td><td>让评审者能沿着“目标—策略—证据”检查，而不是读散文</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="t">为什么要两套方法并用</span>
+      <p>HAZOP 擅长“流程偏差”，STPA 擅长“控制交互”。分体式同时具备这两类特征：对接是一个流程，飞行是一个控制系统。只用一种方法，必然留下盲区。</p>
+    </div>
+  </section>
+
+  <section id="conops">
+    <div class="sec-head">
+      <span class="sec-no">02</span>
+      <h2>运行概念与系统边界<span class="en">ConOps and system boundary</span></h2>
+    </div>
+
+    <p>把一次完整任务切成七个阶段。阶段切分的意义在于：<strong>同一个部件在不同阶段的风险完全不同</strong>，安全需求必须分阶段书写。</p>
+
+    <div class="tw">
+      <table>
+        <caption><b>表 2</b> 任务阶段、关键状态与主要危害源</caption>
+        <thead>
+          <tr><th style="width:120px">阶段</th><th>系统状态</th><th>关键操作</th><th>主要危害源</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>P1 地面运输</b></td><td>飞行体折叠并锁止于陆行体</td><td>公路行驶、进出场地</td><td>交通事故、电池受撞、货物移位</td></tr>
+          <tr><td><b>P2 展开与自检</b></td><td>展开机臂、上电、BIT</td><td>机臂展开、系统自检</td><td>展开未到位、自检漏项、人员靠近</td></tr>
+          <tr><td><b>P3 起飞</b></td><td>垂直爬升</td><td>解锁、起飞许可</td><td>未锁止起飞、地面人员进入、阵风</td></tr>
+          <tr><td><b>P4 爬升与转场</b></td><td>定高巡航</td><td>航线飞行、避让</td><td>动力失效、导航丢失、空中冲突</td></tr>
+          <tr><td><b>P5 进近与着陆</b></td><td>下降、悬停、接地</td><td>着陆决策、复飞</td><td>地面效应扰动、着陆冲击、场地占用冲突</td></tr>
+          <tr><td><b>P6 折叠与回收</b></td><td>断电、折叠、锁止</td><td>回收、充电</td><td>带电折叠、夹伤、充电热失控</td></tr>
+          <tr><td><b>P7 停放与维护</b></td><td>存储、定检</td><td>电池存储、部件更换</td><td>电池老化、维护差错、软件版本错误</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2.1 系统边界的三条线</h3>
+    <ul>
+      <li><strong>物理边界</strong>：陆行体、飞行体、对接接口、地面保障设备。</li>
+      <li><strong>功能边界</strong>：飞行控制、动力与配电、对接控制、通信与监视、乘员保护。</li>
+      <li><strong>责任边界</strong>：制造商（设计与持续适航）、运营人（运行与人员）、驾驶员（操纵决策）、场地方（场地与隔离）。</li>
+    </ul>
+    <p>第三条线最容易被忽略，却是事故调查中最容易产生争议的地方。分体式的特殊之处在于：<strong>同一个人可能既是驾驶员又是“机长”，而切换时刻由一次地面操作触发</strong>。这意味着责任交接必须在程序上有明确的确认动作。</p>
+
+    <div class="callout">
+      <span class="t">本文的核心假设</span>
+      <p>由于企业未公开飞控架构、冗余等级与伞降系统指标，本文在分析中<strong>采用“若具备/若不具备”的双分支表述</strong>，并在结论中指出哪些证据一旦缺失就无法完成论证。这不是回避，而是把不确定性显式化。</p>
+    </div>
+  </section>
+
+  <section id="hazard">
+    <div class="sec-head">
+      <span class="sec-no">03</span>
+      <h2>危害识别与风险评估<span class="en">Hazard identification and risk assessment</span></h2>
+    </div>
+
+    <p>下表列出 12 项安全关键危害。严重度 S（1–4）、暴露率 E（1–4）、可控性 C（1–3）参照汽车 HARA 的定级思路，风险等级由三者综合得出（本文自定的教学分级，不等同于 ASIL 或 DAL）。</p>
+
+    <div class="tw">
+      <table>
+        <caption><b>表 3</b> 安全关键危害清单（H1–H12）</caption>
+        <thead>
+          <tr>
+            <th style="width:44px">ID</th><th>危害描述</th><th style="width:120px">触发场景</th>
+            <th class="num" style="width:34px">S</th><th class="num" style="width:34px">E</th><th class="num" style="width:34px">C</th>
+            <th style="width:70px">等级</th><th>主要控制措施</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>H1</td><td>对接未锁止即起飞，飞行体在爬升中脱开</td><td>P3 起飞</td><td class="num">4</td><td class="num">2</td><td class="num">1</td><td><span class="tag t-open">极高</span></td><td>物理互锁 + 双通道状态确认 + 起飞禁止逻辑</td></tr>
+          <tr><td>H2</td><td>对接过程中飞行体意外启动，旋翼伤人</td><td>P2/P6</td><td class="num">4</td><td class="num">2</td><td class="num">2</td><td><span class="tag t-open">极高</span></td><td>上电互锁、区域感知、双人确认</td></tr>
+          <tr><td>H3</td><td>单台或多台电机失效导致姿态失控</td><td>P4 巡航</td><td class="num">4</td><td class="num">3</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>旋翼冗余、失效检测与推力重分配、可控迫降</td></tr>
+          <tr><td>H4</td><td>动力电池热失控，起火或释能</td><td>全阶段</td><td class="num">4</td><td class="num">2</td><td class="num">1</td><td><span class="tag t-open">极高</span></td><td>电芯选型与成组隔离、热蔓延抑制、BMS 三级保护</td></tr>
+          <tr><td>H5</td><td>飞控计算机单点失效，操纵中断</td><td>P4</td><td class="num">4</td><td class="num">2</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>多通道表决（2oo3）、独立电源、看门狗切换</td></tr>
+          <tr><td>H6</td><td>卫星导航丢失或欺骗，位置不可信</td><td>P4/P5</td><td class="num">3</td><td class="num">3</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>多源融合（INS/视觉/气压）、完好性监测、降级策略</td></tr>
+          <tr><td>H7</td><td>低空阵风或风切变超出控制能力</td><td>P3/P4/P5</td><td class="num">3</td><td class="num">4</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>气象最低标准、风限包线、自动返航</td></tr>
+          <tr><td>H8</td><td>与无人机、鸟类或障碍物空中冲突</td><td>P4</td><td class="num">4</td><td class="num">3</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>空域申请、电子围栏、感知与避让（DAA）</td></tr>
+          <tr><td>H9</td><td>起降场地面人员进入旋翼危险区</td><td>P3/P5</td><td class="num">4</td><td class="num">3</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>隔离区与围栏、地面信号员、起飞前扫视确认</td></tr>
+          <tr><td>H10</td><td>乘员误操作或擅自干预操纵</td><td>P3–P5</td><td class="num">3</td><td class="num">3</td><td class="num">3</td><td><span class="tag t-est">中</span></td><td>操纵权限设计、乘员简报、关键指令确认</td></tr>
+          <tr><td>H11</td><td>软件升级被篡改或版本不匹配</td><td>P7</td><td class="num">4</td><td class="num">1</td><td class="num">2</td><td><span class="tag t-est">中高</span></td><td>签名校验、双分区回滚、版本准入清单</td></tr>
+          <tr><td>H12</td><td>陆行段碰撞导致飞行体电池受损，后续飞行中失效</td><td>P1 → P3</td><td class="num">4</td><td class="num">2</td><td class="num">2</td><td><span class="tag t-open">高</span></td><td>电池箱结构防护、碰撞后强制检测、健康状态准入</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.1 风险分布的两个特征</h3>
+    <p><strong>第一，最高风险集中在“接口”与“能量”两类。</strong>H1、H2、H12 都发生在车与机的交界处；H3、H4 都与能量系统相关。这与整机式的风险分布明显不同——后者最大的风险通常在构型与控制。</p>
+    <p><strong>第二，低频高后果事件占主导。</strong>对接一年可能只做几百次，但每次失误都可能致命。这类事件不能靠“统计可靠性”管理，只能靠<strong>设计上的不可发生性</strong>（物理互锁）与<strong>程序上的强制确认</strong>。</p>
+
+    <div class="callout">
+      <span class="t">由此得到的第一条安全需求</span>
+      <p>SR-01：<strong>在对接接口未通过双通道确认锁止之前，飞行体不得进入可产生升力的状态。</strong>该需求应通过“机械互锁 + 独立传感器 + 软件禁止逻辑”三重实现，任一层失效都不得导致起飞许可。</p>
+    </div>
+  </section>
+
+  <section id="fusa">
+    <div class="sec-head">
+      <span class="sec-no">04</span>
+      <h2>功能安全与冗余架构<span class="en">Functional safety and redundancy</span></h2>
+    </div>
+
+    <p>载人飞行器的功能安全目标，可以用一句话概括：<strong>任何单点失效都不能直接导致失控</strong>；在此基础上，多点失效也要有明确的降级路径与着陆策略。</p>
+
+    <h3>4.1 四条独立链路</h3>
+    <div class="tw">
+      <table>
+        <caption><b>表 4</b> 安全关键链路的冗余要求与验证方式</caption>
+        <thead>
+          <tr><th style="width:120px">链路</th><th>冗余方案（要求）</th><th>失效后的降级</th><th>验证方式</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>飞行控制</b></td><td>三余度计算机 + 交叉表决；传感器独立供电与独立总线</td><td>单通道故障 → 降级为双余度；双通道故障 → 进入安全着陆模式</td><td>故障注入、HIL 台架、试飞验证</td></tr>
+          <tr><td><b>动力与旋翼</b></td><td>N+2 以上旋翼冗余；相邻电机不同配电支路</td><td>失去 1–2 个旋翼仍可维持姿态并着陆</td><td>单/双电机失效试飞、推力重分配仿真</td></tr>
+          <tr><td><b>配电与能源</b></td><td>双电池组 + 独立母线；关键负载双路供电</td><td>单组失效 → 限制载荷，缩短航程返场</td><td>母线故障注入、容量与温升试验</td></tr>
+          <tr><td><b>对接控制</b></td><td>双通道位置传感 + 机械互锁 + 独立使能信号</td><td>任一通道异常 → 禁止起飞 / 禁止分离</td><td>误操作试验、组合故障试验</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>4.2 为什么“三重”而不是“双重”</h3>
+    <p>双重冗余的问题在于<strong>无法区分“谁坏了”</strong>：两套系统给出不同结果时，系统只能二选一或直接失效。三余度通过表决可以定位故障源，从而在第一次失效后仍保持完整功能。代价是重量、功耗与成本——这也是为什么载人 eVTOL 普遍在飞控上采用三余度，而在非关键功能上采用双重。</p>
+
+    <h3>4.3 最后的兜底：整机降落伞</h3>
+    <p>如果产品配备了整机降落伞（弹射伞），它就构成了“结构完整性丧失”这类极端失效的最后一道屏障。但伞降本身引入新的安全需求：<strong>最低开伞高度、开伞姿态约束、着陆冲击耐受、以及开伞后对地面第三方的风险</strong>。它不能替代冗余设计，只能作为残余风险的缓解措施。<span class="tag t-open">是否配备待核实</span></p>
+
+    <div class="callout note">
+      <span class="t">一条容易被忽视的需求</span>
+      <p>SR-02：<strong>任何单一传感器或单一计算通道的故障，都不得导致飞行器进入不可恢复状态。</strong>这条需求看似与 SR-01 无关，实际上决定了“能不能在失效后安全落地”，而不是“能不能不失效”。</p>
+    </div>
+  </section>
+
+  <section id="sotif">
+    <div class="sec-head">
+      <span class="sec-no">05</span>
+      <h2>SOTIF 与人为因素<span class="en">Safety of the intended functionality and human factors</span></h2>
+    </div>
+
+    <p>预期功能安全处理的是“系统没坏，但能力不够或场景超出设计域”的风险。对低空飞行器，这类风险往往比硬件失效更常见。</p>
+
+    <h3>5.1 四类典型 SOTIF 触发</h3>
+    <div class="grid2">
+      <div class="card"><h4>环境边界</h4><p>阵风、下沉气流、地面效应导致的升力突变；雨雾降低能见度与传感器性能；高温导致电池功率受限。</p></div>
+      <div class="card"><h4>感知局限</h4><p>起降场周边的电线、塔吊、树木在视觉上难以分辨；卫星信号在楼宇间被遮挡或多径。</p></div>
+      <div class="card"><h4>状态估计误差</h4><p>电池 SOC 与健康状态（SOH）估计偏差，导致“以为还能飞 5 分钟”实际只剩 2 分钟。</p></div>
+      <div class="card"><h4>人的误用</h4><p>驾驶员把“演示模式”当“正常运行”；乘员在飞行中触碰操纵装置；地面人员误入隔离区。</p></div>
+    </div>
+
+    <h3>5.2 人为因素：分体式特有的“模式切换”</h3>
+    <p>整机式飞行汽车的驾驶员始终在“开车”或“开飞机”之间切换，但切换由同一个座位完成。分体式不同：<strong>切换发生在地面上，且伴随物理操作</strong>。这带来两个风险：</p>
+    <ul>
+      <li><strong>心智模型滞后</strong>：驾驶员刚完成长途驾驶，仍处于“道路模式”的注意力分配习惯，对空域观察不足。</li>
+      <li><strong>程序压缩</strong>：在景区高频运营时，地面准备流程容易被“熟练地省略”，而省略的往往正是检查项。</li>
+    </ul>
+    <p>对应的控制措施不是“加强培训”这类空话，而是<strong>把关键确认做成无法跳过的物理与界面约束</strong>：例如起飞许可必须由两个独立动作触发，且其中一个不在驾驶员顺手的位置。</p>
+
+    <div class="callout">
+      <span class="t">SOTIF 结论</span>
+      <p>分体式的 SOTIF 风险主要不在算法，而在<strong>运行设计域（ODD）的界定</strong>。把“能飞”写成“能在什么风、什么能见度、什么场地、什么载荷下飞”，比提升任何单项性能都更能降低事故率。</p>
+    </div>
+  </section>
+
+  <section id="sec">
+    <div class="sec-head">
+      <span class="sec-no">06</span>
+      <h2>信息安全<span class="en">Cybersecurity: the new attack surface</span></h2>
+    </div>
+
+    <p>当飞行器具备 OTA 升级、远程监控与数据回传能力时，它就同时是一个<strong>联网终端</strong>。对载人航空器，信息安全的后果不再是“数据泄露”，而是“操纵被夺取”。</p>
+
+    <div class="tw">
+      <table>
+        <caption><b>表 5</b> 主要威胁与对策（参照 ISO/SAE 21434 的 TARA 思路）</caption>
+        <thead>
+          <tr><th style="width:140px">资产</th><th>威胁</th><th>影响</th><th>对策</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>飞控指令链路</td><td>指令注入、重放</td><td>非授权操纵</td><td>双向认证、序列号与时效、指令白名单</td></tr>
+          <tr><td>OTA 升级包</td><td>固件篡改、降级攻击</td><td>植入恶意逻辑</td><td>签名验签、安全启动、双分区回滚</td></tr>
+          <tr><td>维修接口</td><td>物理接入读取/改写参数</td><td>参数被篡改</td><td>物理锁、诊断鉴权、审计日志</td></tr>
+          <tr><td>飞行与影像数据</td><td>越权采集、外传</td><td>合规与隐私风险</td><td>数据分级、脱敏、境内存储</td></tr>
+          <tr><td>地面保障设备</td><td>被入侵后作为跳板</td><td>横向渗透至飞行器</td><td>网络分区、最小权限、设备准入</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>需要强调的是：<strong>信息安全不是“加一层加密”</strong>。它要求在架构阶段就划出安全域，把“能影响飞行”的组件与“只影响体验”的组件隔离，并对每一条跨界连接定义准入规则。</p>
+  </section>
+
+  <section id="passive">
+    <div class="sec-head">
+      <span class="sec-no">07</span>
+      <h2>被动安全与电池安全<span class="en">Passive safety and battery safety</span></h2>
+    </div>
+
+    <p>分体式的被动安全要分两段看：<strong>地面段</strong>遵循汽车碰撞逻辑，<strong>空中段</strong>遵循航空器坠撞生存性逻辑。两者的载荷方向、能量量级与乘员姿态都不同。</p>
+
+    <h3>7.1 地面段</h3>
+    <ul>
+      <li>碰撞时飞行体作为“车顶载荷”，必须防止其在碰撞中前移进入乘员舱——这要求额外的约束与吸能设计。</li>
+      <li>飞行体电池箱位于车顶/后舱，是碰撞中的高风险区域，需要独立的抗侵入结构。</li>
+      <li>碰撞后必须能判定“电池是否受损”，否则会出现 H12 描述的“带伤起飞”。</li>
+    </ul>
+
+    <h3>7.2 空中段</h3>
+    <ul>
+      <li><strong>坠撞生存性</strong>：座椅、约束系统与吸能结构需要在有限空间内提供足够的减速行程。</li>
+      <li><strong>应急撤离</strong>：双座舱的舱门/舱盖必须能在无动力、可能变形的情况下快速开启。</li>
+      <li><strong>电池热失控</strong>：空中无法“逃离”，只能靠成组隔离与热蔓延抑制争取着陆时间。</li>
+    </ul>
+
+    <h3>7.3 电池：唯一的“双重高危”部件</h3>
+    <p>电池同时是<strong>能量源</strong>与<strong>火灾源</strong>。在空中它是唯一的能量来源，在地面它又是最大的热失控风险。因此对电池的安全要求必须是双向的：既要有足够的能量与功率余量（避免 SOTIF 的“以为还能飞”），又要有足够的隔离与泄压能力（避免 H4 的连锁失效）。</p>
+
+    <div class="callout">
+      <span class="t">一条工程判断</span>
+      <p>在电池能量密度没有代际提升的前提下，<strong>安全余量与实际航程是直接对立的</strong>。宣传中的“续航 25 分钟”若按 20% 余量计算，实际可用可能只有 15–20 分钟。把这一点写进运行手册，比在参数表上多写 5 分钟更重要。</p>
+    </div>
+  </section>
+
+  <section id="ops">
+    <div class="sec-head">
+      <span class="sec-no">08</span>
+      <h2>运行安全<span class="en">Operational safety</span></h2>
+    </div>
+
+    <p>再好的设计，也需要运行体系兜底。对分体式而言，运行安全的核心是<strong>把“人、场、空、机”四个要素固定下来</strong>。</p>
+
+    <div class="tw">
+      <table>
+        <caption><b>表 6</b> 运行安全的四要素与最低要求</caption>
+        <thead>
+          <tr><th style="width:90px">要素</th><th>最低要求</th><th>失控后的后果</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>人</b></td><td>驾驶员持相应执照；地面设信号员；乘员完成安全简报</td><td>误操作、擅自进入危险区</td></tr>
+          <tr><td><b>场</b></td><td>起降场净空、地面隔离围栏、消防器材、应急通道</td><td>旋翼伤人、火灾扩大</td></tr>
+          <tr><td><b>空</b></td><td>空域申请与报备、电子围栏、气象最低标准</td><td>空中冲突、超气象运行</td></tr>
+          <tr><td><b>机</b></td><td>航前检查、定检间隔、软件版本准入、故障保留清单</td><td>带故障起飞、版本错配</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>8.1 气象最低标准为什么必须“保守”</h3>
+    <p>多旋翼的抗风能力与其推重比直接相关，而推重比又受载荷与电池状态影响。这意味着<strong>同一台机器在不同载重下的风限是不同的</strong>。若运行标准只写一个固定风速值，就会在满载时失效。合理的做法是按“载重—电量—风速”三维矩阵给出运行包线，并在起飞前强制校核。</p>
+
+    <h3>8.2 双证运行的责任边界</h3>
+    <p>分体式最特殊的一点：在 P1 阶段它是道路车辆，在 P3–P5 阶段它是航空器。事故责任、保险条款、监管主体在切换点发生变化。若这个切换点没有明确的“确认动作 + 记录”，事故调查将无法判断适用哪套规则。建议在产品层面定义<strong>“模式声明”</strong>：每次切换都生成一条不可篡改的记录，包含时间、位置、操作者、自检结果。</p>
+
+    <div class="callout note">
+      <span class="t">SR-03</span>
+      <p>系统应在任何时刻都能明确回答：“我现在是车还是机？”——并向外部（监管、保险、事故调查）提供可验证的记录。这不是技术炫技，而是商业模式成立的前提。</p>
+    </div>
+  </section>
+
+  <section id="gsn">
+    <div class="sec-head">
+      <span class="sec-no">09</span>
+      <h2>安全论证<span class="en">Safety argument (GSN skeleton)</span></h2>
+    </div>
+
+    <p>把前面所有分析组织成一条链条：从“残余风险可接受”这个顶层目标出发，逐层分解到可验证的证据。</p>
+
+    <figure>
+      <div class="fig-box">
+        <img src="assets/fig-gsn.svg" alt="GSN 安全论证骨架图：顶层目标、策略、子目标与证据">
+      </div>
+      <figcaption><b>图 2</b> 安全论证骨架。方框为目标（Goal），平行四边形为策略（Strategy），圆形为证据（Solution），虚线框为上下文与假设（Context/Assumption）。<b>注意</b>：图中证据为“应提供的证据类型”，不代表企业已公开。</figcaption>
+    </figure>
+
+    <p>这张图的价值不在于好看，而在于它暴露了<strong>证据缺口</strong>：G2.1 需要故障注入试验报告，G2.2 需要互锁失效试验记录，G2.3 需要场地评估与应急演练记录，G2.4 需要渗透测试与 TARA 报告。任何一项缺失，顶层目标就无法闭合。</p>
+
+    <p>按目前公开信息，这四类证据<strong>均未见披露</strong>。因此本文的结论不是“不安全”，而是<strong>“安全论证尚未完成，无法评价”</strong>——这是一个更准确、也更诚实的表述。</p>
+  </section>
+
+  <section id="map">
+    <div class="sec-head">
+      <span class="sec-no">10</span>
+      <h2>标准映射<span class="en">Standards mapping</span></h2>
+    </div>
+
+    <div class="tw">
+      <table>
+        <caption><b>表 7</b> 本产品涉及的适用标准与本文对应章节</caption>
+        <thead>
+          <tr><th style="width:190px">标准</th><th>适用范围</th><th>本文对应</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ISO 26262</td><td>陆行体 E/E 系统功能安全</td><td>§4 链路冗余（车道侧）</td></tr>
+          <tr><td>ISO 21448</td><td>预期功能安全（SOTIF）</td><td>§5 环境边界与感知局限</td></tr>
+          <tr><td>ISO/SAE 21434</td><td>信息安全工程</td><td>§6 威胁与对策</td></tr>
+          <tr><td>ISO 34502</td><td>场景化测试与安全评价</td><td>§2 任务阶段、§3 危害场景</td></tr>
+          <tr><td>SAE ARP4754A / ARP4761</td><td>民机系统研制与安全评估</td><td>§4 架构、§9 论证结构</td></tr>
+          <tr><td>DO-178C / DO-254</td><td>机载软件与硬件保证</td><td>§4 飞控软件、§6 OTA</td></tr>
+          <tr><td>EASA SC-VTOL</td><td>垂直起降航空器专用条件</td><td>§4–§8 总体安全目标</td></tr>
+          <tr><td>CAAC 专用条件（无人驾驶航空器）</td><td>国内型号合格审定基础</td><td>§9 论证与取证路径</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>需要说明：上述标准的适用对象并不完全相同——ISO 系列面向道路车辆，ARP/DO 系列面向航空器。分体式产品的难点恰在于<strong>如何在同一产品族内合理切分适用域</strong>，而不是把两套标准简单叠加。</p>
+  </section>
+
+  <section id="conclusion">
+    <div class="sec-head">
+      <span class="sec-no">11</span>
+      <h2>结论与建议<span class="en">Conclusions and recommendations</span></h2>
+    </div>
+
+    <ol>
+      <li><strong>分体式的安全核心是接口。</strong>对接接口同时承担机械、电气与“身份切换”三重功能，必须按最高完整性等级设计，并以“不可发生”而非“低概率”为目标。</li>
+      <li><strong>功能安全的关键在独立性与降级路径。</strong>三余度飞控、旋翼冗余、双母线配电，三者缺一不可；仅有冗余而没有降级策略，等于把故障推迟到更危险的时刻。</li>
+      <li><strong>SOTIF 风险应通过 ODD 界定来控制。</strong>把风限、能见度、载荷、场地写成可校核的运行包线，比提升单项性能更能降低事故率。</li>
+      <li><strong>信息安全需要架构级隔离。</strong>把“能影响飞行”的组件与“只影响体验”的组件分区，是所有后续措施的前提。</li>
+      <li><strong>安全论证目前无法闭合。</strong>四类关键证据（故障注入、互锁试验、场地评估、渗透测试）均未见公开披露，因此正确结论是“尚不能评价”，而非“安全”或“不安全”。</li>
+    </ol>
+
+    <div class="callout">
+      <span class="t">三条可执行建议</span>
+      <p>① 在产品定义阶段就发布<strong>运行设计域（ODD）</strong>，把风限、场地、载荷写清楚；② 把<strong>对接接口</strong>单独立项做安全案例，而不是作为整车/整机的一个子项；③ 建立<strong>模式切换记录</strong>机制，为责任划分与事故调查留下可验证证据。</p>
+    </div>
+
+    <p class="small">本文为课程作业，所有危害清单、评分与需求编号均为教学示例，不代表企业实际设计或局方审定结论。</p>
+  </section>
+
+  <section id="refs">
+    <div class="sec-head">
+      <span class="sec-no">REFERENCES</span>
+      <h2>参考文献<span class="en">References</span></h2>
+    </div>
+    <div class="refs">
+      <ol>
+        <li>ISO. ISO 26262:2018 Road vehicles — Functional safety[S]. Geneva: ISO, 2018.</li>
+        <li>ISO. ISO 21448:2022 Road vehicles — Safety of the intended functionality[S]. Geneva: ISO, 2022.</li>
+        <li>ISO/SAE. ISO/SAE 21434:2021 Road vehicles — Cybersecurity engineering[S]. 2021.</li>
+        <li>ISO. ISO 34502:2022 Road vehicles — Test scenarios for automated driving systems[S]. 2022.</li>
+        <li>SAE International. ARP4754A Guidelines for Development of Civil Aircraft and Systems[S]. 2010.</li>
+        <li>SAE International. ARP4761 Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment[S]. 1996.</li>
+        <li>RTCA. DO-178C Software Considerations in Airborne Systems and Equipment Certification[S]. 2011.</li>
+        <li>EASA. Special Condition for VTOL and Means of Compliance (SC-VTOL)[EB/OL]. 2019[2026-11-25]. <a href="https://www.easa.europa.eu/en/document-library/product-certification-consultations/special-condition-vtol">https://www.easa.europa.eu/</a>.</li>
+        <li>中国民用航空局. EH216-S 型无人驾驶航空器系统型号合格审定专用条件[S]. 2022.</li>
+        <li>LEVESON N G. Engineering a Safer World: Systems Thinking Applied to Safety[M]. Cambridge, MA: MIT Press, 2011.</li>
+        <li>KELLY T, WEAVER R. The Goal Structuring Notation — A Safety Argument Notation[C]//Proceedings of the DSN 2004 Workshop on Assurance Cases. 2004.</li>
+        <li>中国汽车工程学会. 飞行汽车发展报告 2.0：迈向空地一体交通新时代[R]. 2026.</li>
+        <li>PAN G, ALOUINI M-S. Flying Car Transportation System: Advances, Techniques, and Challenges[J]. IEEE Access, 2021, 9: 24586-24603.</li>
+      </ol>
+    </div>
+
+    <h3>AI 工具使用记录</h3>
+    <p class="small">本页的框架组织、图表绘制与文字整理在 AI 助手辅助下完成；危害清单的条目选择、S/E/C 评分与安全需求编号由作者确定。所有危害场景均为基于公开运行概念的教学推演，未使用企业未公开数据。</p>
+
+    <div class="next-link">
+      <div>
+        <b>← 返回作业一 · 调研与分析</b>
+        <span>技术可行性、应用场景、市场可行性与竞品比较。</span>
+      </div>
+      <a href="index.html">返回 →</a>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="footer-in">
+    <div>飞行汽车技术基础 · 课程作业 · Case 02</div>
+    <div>证据截止 2026-11-25 · 页面可直接用于 GitHub Pages</div>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
+

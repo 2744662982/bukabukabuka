@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" role="img" aria-label="分体式飞行汽车系统架构">
+  <defs>
+    <style>
+      .b{fill:#fff;stroke:#c8d3dd;stroke-width:1.2}
+      .bh{fill:#0d4f7c;stroke:#0d4f7c}
+      .bo{fill:#fdf3ea;stroke:#e2a06a;stroke-width:1.2}
+      .bg{fill:#f3f7fa;stroke:#cfdbe6;stroke-width:1.2}
+      .t{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;fill:#101a26}
+      .ts{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:11px;fill:#5d6b7a}
+      .tw{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;fill:#fff;font-weight:600}
+      .tt{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:12px;fill:#0d4f7c;font-weight:700;letter-spacing:.08em}
+      .ln{stroke:#93a6b6;stroke-width:1.2;fill:none}
+    </style>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#93a6b6"/>
+    </marker>
+  </defs>
+
+  <!-- 运行环境 -->
+  <rect class="bg" x="20" y="14" width="940" height="78" rx="10"/>
+  <text class="tt" x="36" y="36">运行环境与外部约束</text>
+  <text class="t" x="36" y="58" font-size="12">低空空域与航线 · 起降场/临时起降点 · 气象条件 · 空管与飞行服务</text>
+  <text class="t" x="36" y="78" font-size="12">道路法规 · 驾驶员资质 · 保险与责任 · 社区噪声与隐私</text>
+  <text class="t" x="700" y="58" font-size="12" fill="#c2410c" font-weight="600">整套系统须同时</text>
+  <text class="t" x="700" y="78" font-size="12" fill="#c2410c" font-weight="600">满足“车”与“机”两套监管</text>
+
+  <!-- 陆行体 -->
+  <rect class="b" x="30" y="128" width="360" height="286" rx="12"/>
+  <rect class="bh" x="30" y="128" width="360" height="36" rx="12"/>
+  <rect class="bh" x="30" y="146" width="360" height="18"/>
+  <text class="tw" x="46" y="152">陆行体（地面行驶平台）</text>
+
+  <rect class="b" x="46" y="178" width="328" height="44" rx="7"/>
+  <text class="t" x="60" y="198">车身与座舱</text>
+  <text class="ts" x="60" y="214">六轮布局 · 乘员舱 · 行李/设备舱</text>
+
+  <rect class="b" x="46" y="230" width="328" height="44" rx="7"/>
+  <text class="t" x="60" y="250">行驶系统</text>
+  <text class="ts" x="60" y="266">电驱/增程 · 转向制动 · 悬架 · 轮胎</text>
+
+  <rect class="bo" x="46" y="282" width="328" height="58" rx="7"/>
+  <text class="t" x="60" y="302">能源与补能</text>
+  <text class="ts" x="60" y="318">动力电池 · 飞行体充电接口 · 车载补能单元</text>
+  <text class="ts" x="60" y="333">（充电功率与补能次数未公开）</text>
+
+  <rect class="bo" x="46" y="348" width="328" height="50" rx="7"/>
+  <text class="t" x="60" y="368">对接与承载平台</text>
+  <text class="ts" x="60" y="384">定位对中 · 机械锁止 · 电气与信号连接</text>
+
+  <!-- 飞行体 -->
+  <rect class="b" x="590" y="128" width="360" height="286" rx="12"/>
+  <rect class="bh" x="590" y="128" width="360" height="36" rx="12"/>
+  <rect class="bh" x="590" y="146" width="360" height="18"/>
+  <text class="tw" x="606" y="152">飞行体（载人航空器）</text>
+
+  <rect class="b" x="606" y="178" width="328" height="44" rx="7"/>
+  <text class="t" x="620" y="198">机身与乘员系统</text>
+  <text class="ts" x="620" y="214">双座 · 座舱结构 · 约束与应急撤离</text>
+
+  <rect class="b" x="606" y="230" width="328" height="44" rx="7"/>
+  <text class="t" x="620" y="250">旋翼与动力</text>
+  <text class="ts" x="620" y="266">分布式电推进 · 折叠机臂 · 电机/桨叶</text>
+
+  <rect class="bo" x="606" y="282" width="328" height="58" rx="7"/>
+  <text class="t" x="620" y="302">能源与配电</text>
+  <text class="ts" x="620" y="318">动力电池组 · 高压配电 · 热管理</text>
+  <text class="ts" x="620" y="333">（能量密度与冗余等级未公开）</text>
+
+  <rect class="bo" x="606" y="348" width="328" height="50" rx="7"/>
+  <text class="t" x="620" y="368">飞行控制与航电</text>
+  <text class="ts" x="620" y="384">飞控计算机 · 惯导/卫导 · 通信与监视</text>
+
+  <!-- 中间：接口 -->
+  <rect class="b" x="418" y="196" width="144" height="128" rx="10"/>
+  <text class="t" x="490" y="222" text-anchor="middle" font-weight="600">分离 / 结合</text>
+  <text class="ts" x="490" y="246" text-anchor="middle">机械锁止</text>
+  <text class="ts" x="490" y="266" text-anchor="middle">电气连接</text>
+  <text class="ts" x="490" y="286" text-anchor="middle">状态确认</text>
+  <text class="ts" x="490" y="310" text-anchor="middle" fill="#c2410c" font-weight="600">安全关键接口</text>
+
+  <path class="ln" d="M390 256 L414 256" marker-end="url(#a1)"/>
+  <path class="ln" d="M566 256 L590 256" marker-end="url(#a1)"/>
+
+  <!-- 底部：保障体系 -->
+  <rect class="bg" x="30" y="436" width="920" height="108" rx="10"/>
+  <text class="tt" x="46" y="460">运行保障体系（决定商业化速度的“隐形系统”）</text>
+  <line x1="330" y1="472" x2="330" y2="534" stroke="#dbe3ea" stroke-width="1"/>
+  <line x1="650" y1="472" x2="650" y2="534" stroke="#dbe3ea" stroke-width="1"/>
+
+  <text class="ts" x="46" y="488">· 维修与定检：旋翼 / 电机 / 电池 / 结构寿命</text>
+  <text class="ts" x="46" y="508">· 运行支持：起降场选址、地面隔离、消防应急</text>
+  <text class="ts" x="46" y="528">· 备件与周转：故障件更换周期、库存</text>
+
+  <text class="ts" x="346" y="488">· 人员：飞行员/操作员资质、地面保障培训</text>
+  <text class="ts" x="346" y="508">· 数据：飞行数据记录、OTA 变更管理</text>
+  <text class="ts" x="346" y="528">· 保险与索赔：责任险、事故调查配合</text>
+
+  <text class="ts" x="666" y="488">· 供应链：电芯、电机、复材、航电</text>
+  <text class="ts" x="666" y="508">· 监管沟通：TC / PC / AC 与运行许可</text>
+  <text class="ts" x="666" y="528">· 空域服务：报备、监视、应急协调</text>
+</svg>
